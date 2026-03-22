@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas Gastronômico do Brasil</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --norte: #16a34a;
+  --norte-light: #dcfce7;
+  --nordeste: #0891b2;
+  --nordeste-light: #cffafe;
+  --centro: #d97706;
+  --centro-light: #fef3c7;
+  --sudeste: #dc2626;
+  --sudeste-light: #fee2e2;
+  --sul: #7c3aed;
+  --sul-light: #ede9fe;
+  --bg: #faf6f0;
+  --ink: #1a0f00;
+  --ink-mid: #5c4a32;
+  --paper: #fffdf9;
+  --border: #e8ddd0;
+  --active: var(--norte);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* GRAIN OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.5;
+}
+
+/* HEADER */
+header {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 60px 40px 50px;
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 30px,
+    rgba(255,255,255,0.02) 30px,
+    rgba(255,255,255,0.02) 31px
+  );
+}
+
+.header-inner {
+  max-width: 1300px;
+  margin: auto;
+  position: relative;
+}
+
+.header-eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 16px;
+}
+
+header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -1px;
+}
+
+header h1 em {
+  font-style: italic;
+  color: #f59e0b;
+}
+
+header p {
+  margin-top: 16px;
+  font-family: 'Lora', serif;
+  font-style: italic;
+  color: rgba(255,255,255,0.55);
+  font-size: 16px;
+  max-width: 480px;
+}
+
+.progress-bar-wrap {
+  margin-top: 28px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.progress-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+
+.progress-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.4s;
+}
+
+.progress-dot.done { background: #f59e0b; transform: scale(1.2); }
+
+/* MAIN LAYOUT */
+.main {
+  max-width: 1300px;
+  margin: auto;
+  padding: 50px 40px;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 50px;
+  align-items: start;
+}
+
+/* SIDEBAR */
+.sidebar {
+  position: sticky;
+  top: 30px;
+}
+
+.sidebar-title {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink-mid);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.region-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin-bottom: 6px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.region-btn::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  transition: width 0.3s ease;
+  border-radius: 8px;
+}
+
+.region-btn:hover::before { width: 3px; }
+.region-btn.norte::before { background: var(--norte); }
+.region-btn.nordeste::before { background: var(--nordeste); }
+.region-btn.centro::before { background: var(--centro); }
+.region-btn.sudeste::before { background: var(--sudeste); }
+.region-btn.sul::before { background: var(--sul); }
+
+.region-btn:hover { transform: translateX(4px); border-color: var(--border); background: white; }
+
+.region-btn.active {
+  background: white;
+  border-color: var(--border);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  transform: translateX(6px);
+}
+
+.region-btn.active.norte { border-color: var(--norte); }
+.region-btn.active.nordeste { border-color: var(--nordeste); }
+.region-btn.active.centro { border-color: var(--centro); }
+.region-btn.active.sudeste { border-color: var(--sudeste); }
+.region-btn.active.sul { border-color: var(--sul); }
+
+.region-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.norte .region-icon { background: var(--norte-light); }
+.nordeste .region-icon { background: var(--nordeste-light); }
+.centro .region-icon { background: var(--centro-light); }
+.sudeste .region-icon { background: var(--sudeste-light); }
+.sul .region-icon { background: var(--sul-light); }
+
+.region-text strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.region-text span {
+  font-size: 12px;
+  color: var(--ink-mid);
+}
+
+.region-count {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 20px;
+  opacity: 0.6;
+}
+
+.norte .region-count { background: var(--norte-light); color: var(--norte); }
+.nordeste .region-count { background: var(--nordeste-light); color: var(--nordeste); }
+.centro .region-count { background: var(--centro-light); color: var(--centro); }
+.sudeste .region-count { background: var(--sudeste-light); color: var(--sudeste); }
+.sul .region-count { background: var(--sul-light); color: var(--sul); }
+
+/* MAP AREA */
+.map-wrap {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.map-wrap img {
+  width: 100%;
+  max-width: 380px;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12));
+  transition: filter 0.3s;
+}
+
+.quiz-cta {
+  width: 100%;
+  background: var(--ink);
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.quiz-cta:hover { background: #2d1a00; transform: translateY(-1px); }
+
+/* RIGHT CONTENT */
+.content-area {
+  min-height: 400px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  gap: 16px;
+  padding: 60px;
+  background: white;
+  border: 1.5px dashed var(--border);
+  border-radius: 16px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  opacity: 0.3;
+}
+
+.empty-state h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink-mid);
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: var(--ink-mid);
+  max-width: 280px;
+  line-height: 1.6;
+}
+
+/* PANEL */
+.panel {
+  animation: panelIn 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-header {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 20px;
+}
+
+.panel-tag {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.panel-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.panel-header p {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink-mid);
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+.panel-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 12px;
+  min-width: 80px;
+  text-align: center;
+}
+
+.panel-badge-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.panel-badge-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* CURIOSIDADES */
+.curiosidades-bar {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.curiosidades-bar .icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+.curiosidades-bar strong { display: block; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; color: var(--ink-mid); }
+.curiosidades-bar p { font-size: 13px; line-height: 1.5; }
+
+/* CARDS GRID */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.3, 0.64, 1);
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+  border-color: transparent;
+}
+
+.card-img-wrap {
+  position: relative;
+  overflow: hidden;
+  height: 160px;
+}
+
+.card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.card:hover .card-img-wrap img { transform: scale(1.08); }
+
+.card-difficulty {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.card-body { padding: 16px 18px 18px; }
+
+.card-body h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.card-body p {
+  font-size: 13px;
+  color: var(--ink-mid);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.card-footer {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.card-learn-btn {
+  margin-top: 14px;
+  width: 100%;
+  padding: 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--ink);
+}
+
+.card-learn-btn:hover {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20,10,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  background: var(--paper);
+  border-radius: 20px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalIn 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+  border: 1.5px solid var(--border);
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 18px 18px 0 0;
+}
+
+.modal-body { padding: 30px; }
+
+.modal-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+
+.modal-body h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.modal-body .desc {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink-mid);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.modal-sections { display: flex; flex-direction: column; gap: 16px; }
+
+.modal-section {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.modal-section h4 {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink-mid);
+  margin-bottom: 8px;
+}
+
+.modal-section p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.modal-section ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.modal-section ul li {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.modal-close:hover { transform: rotate(90deg) scale(1.1); }
+
+.modal-wrap { position: relative; }
+
+/* QUIZ */
+.quiz-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--ink);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.quiz-box {
+  background: var(--paper);
+  border-radius: 20px;
+  max-width: 560px;
+  width: 100%;
+  padding: 40px;
+  animation: modalIn 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.quiz-progress {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-bottom: 32px;
+  overflow: hidden;
+}
+
+.quiz-progress-fill {
+  height: 100%;
+  background: #f59e0b;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.quiz-q {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 24px;
+}
+
+.quiz-options { display: flex; flex-direction: column; gap: 10px; }
+
+.quiz-opt {
+  padding: 14px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  background: transparent;
+  text-align: left;
+  transition: all 0.2s;
+  color: var(--ink);
+}
+
+.quiz-opt:hover { border-color: #f59e0b; background: #fef3c7; }
+.quiz-opt.correct { background: #dcfce7; border-color: #16a34a; color: #166534; }
+.quiz-opt.wrong { background: #fee2e2; border-color: #dc2626; color: #991b1b; }
+
+.quiz-feedback {
+  margin-top: 20px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  display: none;
+}
+
+.quiz-feedback.show { display: block; }
+.quiz-feedback.ok { background: #dcfce7; color: #166534; }
+.quiz-feedback.err { background: #fee2e2; color: #991b1b; }
+
+.quiz-next {
+  margin-top: 20px;
+  width: 100%;
+  padding: 14px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: none;
+}
+
+.quiz-next.show { display: block; }
+.quiz-next:hover { background: #2d1a00; }
+
+.quiz-score {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.quiz-score h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.quiz-score p { color: var(--ink-mid); margin-bottom: 24px; font-size: 15px; }
+
+.quiz-score-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 72px;
+  font-weight: 900;
+  color: #f59e0b;
+  line-height: 1;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.quiz-close-btn, .quiz-retry-btn {
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1.5px solid;
+}
+
+.quiz-close-btn { background: transparent; border-color: var(--border); color: var(--ink); margin-right: 10px; }
+.quiz-retry-btn { background: var(--ink); border-color: var(--ink); color: white; }
+.quiz-close-btn:hover { background: var(--bg); }
+.quiz-retry-btn:hover { background: #2d1a00; }
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 40px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--ink-mid);
+  letter-spacing: 0.5px;
+  margin-top: 40px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; padding: 30px 20px; }
+  .sidebar { position: static; }
+  header { padding: 40px 20px; }
+  .map-wrap { display: none; }
+}
+
+@media (max-width: 600px) {
+  .cards { grid-template-columns: 1fr; }
+  .panel-header { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-eyebrow">Gastronomia Brasileira · Material Didático</div>
+    <h1>Atlas <em>Gastronômico</em><br>do Brasil</h1>
+    <p>Explore os sabores, ingredientes e histórias por trás dos pratos mais icônicos de cada região.</p>
+    <div class="progress-bar-wrap">
+      <span class="progress-label">Regiões exploradas</span>
+      <div class="progress-dots" id="progressDots">
+        <div class="progress-dot" id="dot-norte"></div>
+        <div class="progress-dot" id="dot-nordeste"></div>
+        <div class="progress-dot" id="dot-centro"></div>
+        <div class="progress-dot" id="dot-sudeste"></div>
+        <div class="progress-dot" id="dot-sul"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <aside class="sidebar">
+    <div class="sidebar-title">Selecione uma região</div>
+
+    <div class="region-btn norte" onclick="mostrar('norte')">
+      <div class="region-icon">🌿</div>
+      <div class="region-text">
+        <strong>Norte</strong>
+        <span>Sabores amazônicos</span>
+      </div>
+      <div class="region-count">3</div>
+    </div>
+
+    <div class="region-btn nordeste" onclick="mostrar('nordeste')">
+      <div class="region-icon">🌊</div>
+      <div class="region-text">
+        <strong>Nordeste</strong>
+        <span>Influência africana</span>
+      </div>
+      <div class="region-count">3</div>
+    </div>
+
+    <div class="region-btn centro" onclick="mostrar('centro')">
+      <div class="region-icon">🌾</div>
+      <div class="region-text">
+        <strong>Centro-Oeste</strong>
+        <span>Sabores do Cerrado</span>
+      </div>
+      <div class="region-count">2</div>
+    </div>
+
+    <div class="region-btn sudeste" onclick="mostrar('sudeste')">
+      <div class="region-icon">🏙️</div>
+      <div class="region-text">
+        <strong>Sudeste</strong>
+        <span>Diversidade cultural</span>
+      </div>
+      <div class="region-count">2</div>
+    </div>
+
+    <div class="region-btn sul" onclick="mostrar('sul')">
+      <div class="region-icon">❄️</div>
+      <div class="region-text">
+        <strong>Sul</strong>
+        <span>Influência europeia</span>
+      </div>
+      <div class="region-count">2</div>
+    </div>
+
+    <div class="map-wrap" style="margin-top:28px;">
+      <img src="img/mapa-brasil.svg" alt="Mapa das regiões do Brasil">
+      <button class="quiz-cta" onclick="iniciarQuiz()">
+        🎯 Testar Conhecimento
+      </button>
+    </div>
+  </aside>
+
+  <div class="content-area" id="contentArea">
+    <div class="empty-state">
+      <div class="empty-icon">🗺️</div>
+      <h3>Escolha uma região</h3>
+      <p>Selecione uma região no painel ao lado para descobrir os pratos típicos e suas histórias.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Atlas Gastronômico do Brasil · Material de apoio para alunos de gastronomia
+</footer>
+
+<script>
+const dados = {
+  norte: {
+    titulo: "Região Norte",
+    subtitulo: "Sabores da Floresta Amazônica",
+    cor: "#16a34a",
+    corLight: "#dcfce7",
+    emoji: "🌿",
+    contexto: "A maior região do Brasil abriga a Floresta Amazônica e tem uma culinária única, fortemente influenciada pelos povos indígenas. Ingredientes como tucupi, jambu, mandioca e peixes de rio são protagonistas.",
+    curiosidade: "O tucupi é um caldo amarelo extraído da mandioca-brava fermentada. Antes do preparo, é necessário fervê-lo por horas para eliminar o ácido cianídrico tóxico — um conhecimento transmitido pelos povos indígenas há séculos.",
+    pratos: [
+      {
+        nome: "Tacacá",
+        img: "img/tacaca.jpg",
+        desc: "Caldo amazônico com tucupi, jambu e camarão seco.",
+        dificuldade: "Médio",
+        origem: "Pará",
+        ocasiao: "Comida de rua",
+        ingredientes: ["Tucupi", "Folhas de jambu", "Camarão seco", "Goma de tapioca", "Sal e pimenta"],
+        historia: "O tacacá é vendido pelas chamadas 'tacacazeiras', geralmente mulheres que carregam cuias com o caldo quente pelas ruas de Belém. É um símbolo cultural da capital paraense.",
+        tags: ["Indígena", "Rua", "Quente"],
+        corTag: "#16a34a", corTagBg: "#dcfce7"
+      },
+      {
+        nome: "Pato no Tucupi",
+        img: "img/pato-no-tucupi.jpg",
+        desc: "Prato típico paraense preparado com tucupi e jambu.",
+        dificuldade: "Difícil",
+        origem: "Pará",
+        ocasiao: "Festividades",
+        ingredientes: ["Pato", "Tucupi", "Jambu", "Alho", "Chicória", "Cheiro-verde"],
+        historia: "Prato obrigatório no Círio de Nazaré, a maior festa religiosa do Brasil. O pato fica marinado e cozido no tucupi fermentado, resultando em um sabor complexo e único.",
+        tags: ["Festivo", "Tradicional"],
+        corTag: "#16a34a", corTagBg: "#dcfce7"
+      },
+      {
+        nome: "Maniçoba",
+        img: "img/manicoba.jpg",
+        desc: "Prato feito com folhas de mandioca-brava cozidas por dias.",
+        dificuldade: "Difícil",
+        origem: "Pará / Bahia",
+        ocasiao: "Celebrações",
+        ingredientes: ["Folha de mandioca-brava", "Linguiça", "Toucinho defumado", "Carne seca", "Paio"],
+        historia: "Chamada de 'feijoada amazônica', a maniçoba leva 4 a 7 dias de cozimento para neutralizar o ácido cianídrico das folhas. É servida em festas do Círio e no São João.",
+        tags: ["Demorado", "Festivo"],
+        corTag: "#16a34a", corTagBg: "#dcfce7"
+      }
+    ]
+  },
+
+  nordeste: {
+    titulo: "Região Nordeste",
+    subtitulo: "Herança Africana e Portuguesa",
+    cor: "#0891b2",
+    corLight: "#cffafe",
+    emoji: "🌊",
+    contexto: "A gastronomia nordestina é marcada por uma fusão única de sabores africanos, indígenas e portugueses. O dendê, a castanha de caju, o milho e o coco são ingredientes centrais em uma das culinárias mais ricas do país.",
+    curiosidade: "O azeite de dendê, essencial na cozinha baiana, é extraído do fruto da palmeira dendezeiro, trazida da África pelos escravizados. Ele é rico em betacaroteno, o que lhe confere a cor alaranjada característica.",
+    pratos: [
+      {
+        nome: "Acarajé",
+        img: "img/acaraje.jpg",
+        desc: "Bolinho de feijão-fradinho frito no azeite de dendê.",
+        dificuldade: "Médio",
+        origem: "Bahia",
+        ocasiao: "Comida de rua / Religiosa",
+        ingredientes: ["Feijão-fradinho", "Dendê", "Cebola", "Vatapá", "Caruru", "Pimenta"],
+        historia: "O acarajé tem origem nas religiões de matriz africana. 'Acarajé' significa 'comer bola de fogo' em yorubá. As baianas de acarajé são reconhecidas como Patrimônio Cultural Imaterial do Brasil.",
+        tags: ["Patrimônio", "Afro-brasileiro"],
+        corTag: "#0891b2", corTagBg: "#cffafe"
+      },
+      {
+        nome: "Moqueca Baiana",
+        img: "img/moqueca.jpg",
+        desc: "Ensopado de frutos do mar com leite de coco e dendê.",
+        dificuldade: "Médio",
+        origem: "Bahia",
+        ocasiao: "Almoço / Jantar",
+        ingredientes: ["Peixe ou camarão", "Leite de coco", "Dendê", "Tomate", "Cebola", "Coentro"],
+        historia: "A moqueca baiana se diferencia da capixaba pelo uso do azeite de dendê e leite de coco, influência africana. Já a capixaba usa urucum e azeite de oliva. A disputa entre as duas é conhecida e bem-humorada.",
+        tags: ["Frutos do mar", "Afro-brasileiro"],
+        corTag: "#0891b2", corTagBg: "#cffafe"
+      },
+      {
+        nome: "Baião de Dois",
+        img: "img/baiao-de-dois.jpg",
+        desc: "Arroz com feijão-de-corda, queijo coalho e manteiga de garrafa.",
+        dificuldade: "Fácil",
+        origem: "Ceará",
+        ocasiao: "Dia a dia",
+        ingredientes: ["Feijão-de-corda", "Arroz", "Queijo coalho", "Manteiga de garrafa", "Coentro", "Bacon"],
+        historia: "O nome vem da expressão nordestina 'baião', uma dança popular. Prato humilde e nutritivo, era consumido pelos trabalhadores rurais do sertão. Hoje é considerado uma das joias da culinária nordestina.",
+        tags: ["Sertão", "Cotidiano"],
+        corTag: "#0891b2", corTagBg: "#cffafe"
+      }
+    ]
+  },
+
+  centro: {
+    titulo: "Centro-Oeste",
+    subtitulo: "Riquezas do Cerrado",
+    cor: "#d97706",
+    corLight: "#fef3c7",
+    emoji: "🌾",
+    contexto: "A culinária do Centro-Oeste mistura influências indígenas, sertanejas e gaúchas. O cerrado oferece ingredientes únicos como o pequi, o baru e o guariroba, além da pecuária que garante carnes de alta qualidade.",
+    curiosidade: "O pequi é o fruto símbolo de Goiás, mas exige habilidade para comer: seu caroço é cheio de espinhos internos invisíveis que podem cravar na gengiva. A técnica correta é não morder, apenas chupar a polpa.",
+    pratos: [
+      {
+        nome: "Arroz com Pequi",
+        img: "img/arroz-pequi.jpg",
+        desc: "Prato tradicional de Goiás com o fruto símbolo do cerrado.",
+        dificuldade: "Fácil",
+        origem: "Goiás",
+        ocasiao: "Festas juninas / Almoço",
+        ingredientes: ["Arroz", "Pequi", "Alho", "Sal", "Cheiro-verde", "Frango (opcional)"],
+        historia: "O pequi é sagrado para povos como os Xavante. Seu fruto amarelo de aroma intenso e sabor marcante é o centro da identidade culinária goiana. A temporada do pequi de novembro a março é celebrada como festa.",
+        tags: ["Cerrado", "Indígena", "Sazonal"],
+        corTag: "#d97706", corTagBg: "#fef3c7"
+      },
+      {
+        nome: "Pacu Assado",
+        img: "img/pacu-assado.jpg",
+        desc: "Peixe do Pantanal assado inteiro, típico do Mato Grosso.",
+        dificuldade: "Fácil",
+        origem: "Mato Grosso / Mato Grosso do Sul",
+        ocasiao: "Almoço / Pesca esportiva",
+        ingredientes: ["Pacu inteiro", "Sal grosso", "Limão", "Alho", "Alecrim"],
+        historia: "O Pantanal é um dos maiores produtores de peixes de água doce do Brasil. O pacu, por sua carne gorda e saborosa, é o peixe mais apreciado da região, geralmente assado na brasa ou em forno de barro.",
+        tags: ["Pantanal", "Pesca"],
+        corTag: "#d97706", corTagBg: "#fef3c7"
+      }
+    ]
+  },
+
+  sudeste: {
+    titulo: "Região Sudeste",
+    subtitulo: "Encontro de Culturas",
+    cor: "#dc2626",
+    corLight: "#fee2e2",
+    emoji: "🏙️",
+    contexto: "O Sudeste reúne a maior diversidade gastronômica do Brasil, resultado da imigração italiana, japonesa, libanesa e de migrações internas. É berço de pratos emblemáticos que se tornaram símbolos nacionais.",
+    curiosidade: "A feijoada, considerada o 'prato nacional' do Brasil, tem origem controversa. Uma teoria diz que escravizados a criavam com as partes do porco que os senhores descartavam. Historiadores modernos, porém, questionam essa versão.",
+    pratos: [
+      {
+        nome: "Feijoada",
+        img: "img/feijoada.jpg",
+        desc: "Feijão-preto com carnes de porco defumadas e salgadas.",
+        dificuldade: "Difícil",
+        origem: "Rio de Janeiro (popularizada)",
+        ocasiao: "Sábado / Comemorações",
+        ingredientes: ["Feijão-preto", "Carne seca", "Paio", "Linguiça", "Costela", "Lombo", "Laranja"],
+        historia: "Servida tradicionalmente às quartas e sábados, a feijoada é um ritual social. Acompanhada de arroz, couve refogada, farofa, laranja e caipirinha, é considerada por muitos o símbolo máximo da culinária brasileira.",
+        tags: ["Nacional", "Festivo", "Sábado"],
+        corTag: "#dc2626", corTagBg: "#fee2e2"
+      },
+      {
+        nome: "Pão de Queijo",
+        img: "img/pao-de-queijo.jpg",
+        desc: "Bolinho mineiro de polvilho com queijo, crocante por fora e macio por dentro.",
+        dificuldade: "Fácil",
+        origem: "Minas Gerais",
+        ocasiao: "Café da manhã / Lanche",
+        ingredientes: ["Polvilho azedo", "Polvilho doce", "Queijo meia-cura", "Ovos", "Leite", "Óleo"],
+        historia: "Surgiu em Minas Gerais no século XVIII. Como o trigo era caro e raro, os mineiros usavam o polvilho da mandioca. Hoje é exportado para o mundo inteiro e virou símbolo do Brasil no exterior.",
+        tags: ["Lanche", "Mineiro", "Exportado"],
+        corTag: "#dc2626", corTagBg: "#fee2e2"
+      }
+    ]
+  },
+
+  sul: {
+    titulo: "Região Sul",
+    subtitulo: "Herança Europeia nas Terras Gaúchas",
+    cor: "#7c3aed",
+    corLight: "#ede9fe",
+    emoji: "❄️",
+    contexto: "A gastronomia sulista reflete fortemente a imigração alemã, italiana e polonesa a partir do século XIX, somada à cultura gaúcha do pampa. Carnes, embutidos, massas e pães artesanais dominam a mesa.",
+    curiosidade: "O chimarrão, bebida símbolo da cultura gaúcha, é mais do que uma bebida: é um ritual de partilha. A cuia passa de mão em mão sem que ninguém vire o bico do meado — virar é considerado indelicadeza.",
+    pratos: [
+      {
+        nome: "Churrasco Gaúcho",
+        img: "img/churrasco.jpg",
+        desc: "Carne bovina assada lentamente na brasa com sal grosso.",
+        dificuldade: "Médio",
+        origem: "Rio Grande do Sul",
+        ocasiao: "Domingo / Comemorações",
+        ingredientes: ["Costela bovina", "Picanha", "Sal grosso", "Brasa de lenha"],
+        historia: "O churrasco gaúcho tem origem nos tropeiros e peões que assavam a carne no campo. A técnica do 'fogo de chão' com costela de boi é considerada sagrada pelos gaúchos. Uma costela pode levar mais de 8 horas.",
+        tags: ["Gaúcho", "Brasa", "Tradicional"],
+        corTag: "#7c3aed", corTagBg: "#ede9fe"
+      },
+      {
+        nome: "Barreado",
+        img: "img/barreado.jpg",
+        desc: "Cozido de carne bovina em panela de barro vedada com farinha.",
+        dificuldade: "Difícil",
+        origem: "Paraná (Litoral)",
+        ocasiao: "Carnaval / Festas populares",
+        ingredientes: ["Carne bovina", "Toucinho", "Tomate", "Cebola", "Alho", "Cominho", "Farinha para vedar"],
+        historia: "Prato inventado para o Carnaval: a panela de barro era vedada com massa de farinha ('barreada'), levada ao fogo de véspera e ficava cozinhando enquanto todos festejavam. No dia seguinte, a refeição estava pronta.",
+        tags: ["Carnaval", "Lento", "Litoral"],
+        corTag: "#7c3aed", corTagBg: "#ede9fe"
+      }
+    ]
+  }
+};
+
+// Quiz questions
+const quizPerguntas = [
+  { p: "Qual ingrediente tóxico precisa ser neutralizado antes do uso no Tacacá e na Maniçoba?", opts: ["Urucum", "Tucupi (ácido cianídrico)", "Dendê", "Pequi"], correta: 1, exp: "O tucupi é extraído da mandioca-brava e contém ácido cianídrico. É necessário fervê-lo por horas para eliminar a toxina." },
+  { p: "O acarajé é um patrimônio imaterial brasileiro associado a qual tradição cultural?", opts: ["Cultura indígena amazônica", "Imigração italiana", "Religiões de matriz africana (candomblé)", "Culinária portuguesa"], correta: 2, exp: "O acarajé tem origem no candomblé — é oferenda a Iansã — e as baianas de acarajé são Patrimônio Cultural Imaterial do IPHAN." },
+  { p: "Qual técnica especial é necessária para comer pequi com segurança?", opts: ["Retirar a casca verde antes", "Cozinhar por pelo menos 2 horas", "Não morder o caroço — apenas chupar a polpa", "Retirar as sementes antes de servir"], correta: 2, exp: "O caroço do pequi tem espinhos internos invisíveis. A técnica é chupar a polpa sem morder — engolir um espinho pode causar perfurações sérias." },
+  { p: "O barreado paranaense era preparado para qual festividade porque ficava cozinhando sozinho?", opts: ["Natal", "Festa Junina", "Carnaval", "Círio de Nazaré"], correta: 2, exp: "A panela era vedada e levada ao fogo de véspera para que as pessoas pudessem festejar o Carnaval. A refeição ficava pronta no dia seguinte." },
+  { p: "Qual é a diferença principal entre a moqueca baiana e a moqueca capixaba?", opts: ["A baiana usa frutos do mar, a capixaba usa só peixe", "A baiana leva dendê e leite de coco; a capixaba usa urucum e sem dendê", "A capixaba é servida em panela de pedra, a baiana em cuia", "A baiana é refogada, a capixaba é assada"], correta: 1, exp: "A moqueca baiana tem influência africana (dendê e coco). A capixaba, herança indígena e portuguesa, usa urucum para colorir e não leva dendê." },
+  { p: "O pão de queijo surgiu em Minas Gerais no século XVIII. Por que se usava polvilho em vez de farinha de trigo?", opts: ["O polvilho tem mais proteína", "O trigo era escasso e caro na colônia", "Os mineiros preferiam o sabor do polvilho", "A farinha de trigo não cresce em altitude"], correta: 1, exp: "O trigo era importado e caro na colônia. Os mineiros adaptaram a receita com polvilho (fécula de mandioca), ingrediente local e acessível." }
+];
+
+let visitadas = new Set();
+let quizAtual = 0;
+let quizScore = 0;
+let quizQs = [];
+
+function mostrar(regiao) {
+  // Update active state
+  document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.region-btn.' + regiao)[0]?.classList.add('active');
+
+  // Track progress
+  visitadas.add(regiao);
+  document.querySelectorAll('.progress-dot').forEach(d => d.classList.remove('done'));
+  visitadas.forEach(r => {
+    const dot = document.getElementById('dot-' + r);
+    if (dot) dot.classList.add('done');
+  });
+
+  const d = dados[regiao];
+  const area = document.getElementById('contentArea');
+
+  area.innerHTML = `
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-tag" style="color:${d.cor}">${d.emoji} ${d.subtitulo}</div>
+          <h2>${d.titulo}</h2>
+          <p>${d.contexto}</p>
+        </div>
+        <div class="panel-badge" style="background:${d.corLight}">
+          <span class="panel-badge-num" style="color:${d.cor}">${d.pratos.length}</span>
+          <span class="panel-badge-label">Pratos</span>
+        </div>
+      </div>
+
+      <div class="curiosidades-bar">
+        <div class="icon">💡</div>
+        <div>
+          <strong>Você sabia?</strong>
+          <p>${d.curiosidade}</p>
+        </div>
+      </div>
+
+      <div class="cards">
+        ${d.pratos.map((p, i) => `
+          <div class="card" onclick="abrirModal('${regiao}',${i})">
+            <div class="card-img-wrap">
+              <img src="${p.img}" alt="${p.nome}" onerror="this.src='https://placehold.co/400x300/f8fafc/94a3b8?text=${encodeURIComponent(p.nome)}'">
+              <div class="card-difficulty">${p.dificuldade}</div>
+            </div>
+            <div class="card-body">
+              <h4>${p.nome}</h4>
+              <p>${p.desc}</p>
+              <div class="card-footer">
+                ${p.tags.map(t => `<span class="tag" style="background:${p.corTagBg};color:${p.corTag}">${t}</span>`).join('')}
+              </div>
+              <button class="card-learn-btn">Ver detalhes e história →</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function abrirModal(regiao, idx) {
+  const p = dados[regiao].pratos[idx];
+  const d = dados[regiao];
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.onclick = (e) => { if (e.target === overlay) fecharModal(overlay); };
+
+  overlay.innerHTML = `
+    <div class="modal-wrap">
+      <div class="modal">
+        <img class="modal-img" src="${p.img}" alt="${p.nome}" onerror="this.src='https://placehold.co/640x260/f8fafc/94a3b8?text=${encodeURIComponent(p.nome)}'">
+        <div class="modal-body">
+          <div class="modal-tags">
+            ${p.tags.map(t => `<span class="tag" style="background:${p.corTagBg};color:${p.corTag}">${t}</span>`).join('')}
+            <span class="tag" style="background:#f8fafc;color:#64748b">🍽 ${p.ocasiao}</span>
+            <span class="tag" style="background:#f8fafc;color:#64748b">📍 ${p.origem}</span>
+          </div>
+          <h2>${p.nome}</h2>
+          <p class="desc">${p.desc}</p>
+          <div class="modal-sections">
+            <div class="modal-section">
+              <h4>📖 História & Contexto</h4>
+              <p>${p.historia}</p>
+            </div>
+            <div class="modal-section">
+              <h4>🛒 Ingredientes Principais</h4>
+              <ul>${p.ingredientes.map(i => `<li>${i}</li>`).join('')}</ul>
+            </div>
+            <div class="modal-section">
+              <h4>👨‍🍳 Dificuldade de Preparo</h4>
+              <p><strong>${p.dificuldade}</strong> — ${p.dificuldade === 'Fácil' ? 'Receita acessível para iniciantes.' : p.dificuldade === 'Médio' ? 'Requer atenção às técnicas regionais.' : 'Preparo complexo com técnicas tradicionais específicas.'}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="fecharModal(document.querySelector('.modal-overlay'))">✕</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
+}
+
+function fecharModal(overlay) {
+  overlay.style.animation = 'fadeOut 0.2s ease forwards';
+  setTimeout(() => {
+    overlay.remove();
+    document.body.style.overflow = '';
+  }, 180);
+}
+
+// Add fadeOut keyframe
+const style = document.createElement('style');
+style.textContent = '@keyframes fadeOut { to { opacity: 0; } }';
+document.head.appendChild(style);
+
+// QUIZ
+function iniciarQuiz() {
+  quizAtual = 0;
+  quizScore = 0;
+  quizQs = [...quizPerguntas].sort(() => Math.random() - 0.5).slice(0, 5);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'quiz-overlay';
+  overlay.id = 'quizOverlay';
+  document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
+  renderQuizPergunta();
+}
+
+function renderQuizPergunta() {
+  const overlay = document.getElementById('quizOverlay');
+  if (quizAtual >= quizQs.length) {
+    overlay.innerHTML = `
+      <div class="quiz-box">
+        <div class="quiz-score">
+          <span class="quiz-score-num">${quizScore}/${quizQs.length}</span>
+          <h2>${quizScore >= 4 ? '🏆 Excelente!' : quizScore >= 2 ? '👍 Bom trabalho!' : '📚 Continue estudando!'}</h2>
+          <p>${quizScore >= 4 ? 'Você domina a gastronomia brasileira!' : quizScore >= 2 ? 'Você conhece bastante, mas há mais para explorar.' : 'Explore as regiões com calma e tente novamente.'}</p>
+          <div>
+            <button class="quiz-close-btn" onclick="fecharQuiz()">Fechar</button>
+            <button class="quiz-retry-btn" onclick="fecharQuiz(); iniciarQuiz()">Tentar novamente</button>
+          </div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const q = quizQs[quizAtual];
+  const pct = (quizAtual / quizQs.length) * 100;
+
+  overlay.innerHTML = `
+    <div class="quiz-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <span style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#94a3b8">Pergunta ${quizAtual + 1} de ${quizQs.length}</span>
+        <span style="font-size:12px;color:#f59e0b;font-weight:600">${quizScore} corretas</span>
+      </div>
+      <div class="quiz-progress"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
+      <p class="quiz-q">${q.p}</p>
+      <div class="quiz-options">
+        ${q.opts.map((o, i) => `<button class="quiz-opt" onclick="responder(${i})" id="opt${i}">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <button class="quiz-next" id="quizNext" onclick="proximaPergunta()">
+        ${quizAtual < quizQs.length - 1 ? 'Próxima pergunta →' : 'Ver resultado →'}
+      </button>
+    </div>
+  `;
+}
+
+function responder(idx) {
+  const q = quizQs[quizAtual];
+  const opts = document.querySelectorAll('.quiz-opt');
+  const feedback = document.getElementById('quizFeedback');
+  const next = document.getElementById('quizNext');
+
+  opts.forEach(o => o.onclick = null);
+
+  if (idx === q.correta) {
+    quizScore++;
+    opts[idx].classList.add('correct');
+    feedback.className = 'quiz-feedback show ok';
+    feedback.innerHTML = `✅ Correto! ${q.exp}`;
+  } else {
+    opts[idx].classList.add('wrong');
+    opts[q.correta].classList.add('correct');
+    feedback.className = 'quiz-feedback show err';
+    feedback.innerHTML = `❌ Incorreto. ${q.exp}`;
+  }
+
+  next.classList.add('show');
+}
+
+function proximaPergunta() {
+  quizAtual++;
+  renderQuizPergunta();
+}
+
+function fecharQuiz() {
+  const overlay = document.getElementById('quizOverlay');
+  if (overlay) {
+    overlay.style.animation = 'fadeOut 0.2s ease forwards';
+    setTimeout(() => { overlay.remove(); document.body.style.overflow = ''; }, 180);
+  }
+}
+</script>
+</body>
+</html>
